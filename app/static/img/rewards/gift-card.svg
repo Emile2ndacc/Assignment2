@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 190" fill="none">
+  <defs>
+    <linearGradient id="card" x1="60" y1="35" x2="300" y2="157" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E588A"/>
+      <stop offset="1" stop-color="#0D3156"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="181" y1="52" x2="181" y2="147" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4CE79"/>
+      <stop offset="1" stop-color="#D89B35"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="190" rx="18" fill="#E5EEF7"/>
+  <circle cx="61" cy="44" r="25" fill="#D9A23F" opacity=".2"/>
+  <circle cx="313" cy="154" r="36" fill="#0D5EA8" opacity=".09"/>
+  <rect x="61" y="37" width="238" height="116" rx="16" fill="url(#card)" stroke="#102A43" stroke-width="3"/>
+  <path d="M160 37h40v116h-40z" fill="url(#ribbon)"/>
+  <path d="M61 83h238v34H61z" fill="url(#ribbon)"/>
+  <path d="M180 84c-13-18-34-21-39-9-5 11 13 17 39 9Zm0 0c13-18 34-21 39-9 5 11-13 17-39 9Z" fill="#F8D987" stroke="#B67C22" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m162 116 18 18 18-18" stroke="#B67C22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

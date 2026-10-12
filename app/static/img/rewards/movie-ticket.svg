@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 190" fill="none">
+  <defs>
+    <linearGradient id="ticket" x1="45" y1="29" x2="310" y2="162" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF3D5"/>
+      <stop offset="1" stop-color="#F2C56E"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="108" y1="53" x2="253" y2="136" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#153B63"/>
+      <stop offset="1" stop-color="#0D5EA8"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="190" rx="18" fill="#F7EBD2"/>
+  <circle cx="308" cy="38" r="25" fill="#E5B858" opacity=".32"/>
+  <circle cx="45" cy="158" r="34" fill="#0D5EA8" opacity=".08"/>
+  <path d="M71 43h218a13 13 0 0 1 13 13v17a14 14 0 0 0 0 28v17a13 13 0 0 1-13 13H71a13 13 0 0 1-13-13v-17a14 14 0 0 0 0-28V56a13 13 0 0 1 13-13Z" fill="url(#ticket)" stroke="#B67C22" stroke-width="3"/>
+  <path d="M258 45v84" stroke="#B67C22" stroke-width="2.5" stroke-dasharray="5 7" opacity=".72"/>
+  <rect x="91" y="62" width="144" height="62" rx="10" fill="url(#screen)"/>
+  <path d="m150 78 30 15-30 15V78Z" fill="#FFF8E8"/>
+  <path d="M272 70h10M272 82h10M272 94h10M272 106h10" stroke="#9B661B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M82 54h8M82 66h8M82 78h8" stroke="#B67C22" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+</svg>

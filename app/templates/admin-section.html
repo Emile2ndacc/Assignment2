@@ -1,0 +1,97 @@
+{% extends "authenticated-base.html" %}
+{% block title %}{{ 'Admin Dashboard' if page == 'home' else 'Leaderboard' if page == 'leaderboard' else 'Redemption Review' }}{% endblock %}
+
+{% block subpage_content %}
+<div class="student-shell">
+  {% if page == 'home' %}
+  <div class="row align-items-center mb-4">
+    <div class="col">
+      <p class="section-kicker">Admin</p>
+      <h1 class="h3 mb-0">Admin dashboard</h1>
+    </div>
+  </div>
+  <div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="metric-card"><span>Pending redemptions</span><strong>{{ pending_redemptions|length }}</strong></div></div>
+    <div class="col-md-4"><div class="metric-card"><span>Students</span><strong>{{ leaderboard|length }}</strong></div></div>
+    <div class="col-md-4"><div class="metric-card"><span>Active awards</span><strong>{{ award_count }}</strong></div></div>
+  </div>
+  <div class="row g-3">
+    <div class="col-md-6 col-xl-4">
+      <a class="section-link-card" href="{{ url_for('admin_leaderboard_view') }}">
+        <span class="material-symbols-outlined" aria-hidden="true">leaderboard</span>
+        <span class="section-link-title">Leaderboard</span>
+        <span class="section-link-description">Review student volunteer totals and rankings.</span>
+        <span class="material-symbols-outlined section-link-arrow" aria-hidden="true">arrow_forward</span>
+      </a>
+    </div>
+    <div class="col-md-6 col-xl-4">
+      <a class="section-link-card" href="{{ url_for('admin_redemptions_view') }}">
+        <span class="material-symbols-outlined" aria-hidden="true">fact_check</span>
+        <span class="section-link-title">Redemption review</span>
+        <span class="section-link-description">Approve or deny student award requests.</span>
+        <span class="material-symbols-outlined section-link-arrow" aria-hidden="true">arrow_forward</span>
+      </a>
+    </div>
+    <div class="col-md-6 col-xl-4">
+      <a class="section-link-card" href="{{ url_for('admin_appeals_view') }}">
+        <span class="material-symbols-outlined" aria-hidden="true">record_voice_over</span>
+        <span class="section-link-title">Student Appeals</span>
+        <span class="section-link-description">Review appeals on denied award requests.</span>
+        <span class="material-symbols-outlined section-link-arrow" aria-hidden="true">arrow_forward</span>
+      </a>
+    </div>
+  </div>
+  {% elif page == 'leaderboard' %}
+  <div class="row align-items-center mb-4">
+    <div class="col"><p class="section-kicker">Admin</p><h1 class="h3 mb-0">Leaderboard</h1></div>
+  </div>
+  <section class="panel-block">
+    <div class="panel-header"><h2>Volunteer totals</h2></div>
+    <div class="table-wrap">
+      <table class="table leaderboard-table align-middle">
+        <thead><tr><th>Rank</th><th>Student</th><th>Hours</th></tr></thead>
+        <tbody>
+          {% for entry in leaderboard %}
+          <tr><td>#{{ entry.rank }}</td><td>{{ entry.username }}</td><td>{{ '%.1f' % entry.total_hours }}h</td></tr>
+          {% else %}
+          <tr><td colspan="3" class="text-center">No volunteer totals yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% else %}
+  <div class="row align-items-center mb-4">
+    <div class="col-md-8"><p class="section-kicker">Admin review</p><h1 class="h3 mb-0">Pending redemptions</h1></div>
+    <div class="col-md-4 text-md-end"><span class="chip chip-primary">{{ pending_redemptions|length }} pending</span></div>
+  </div>
+  <section class="panel-block">
+    <div class="panel-header"><h2>Award requests</h2></div>
+    {% if pending_redemptions %}
+    <div class="table-wrap">
+      <table class="table align-middle">
+        <thead><tr><th>Student</th><th>Award</th><th>Date</th><th>Notes</th><th>Decision</th></tr></thead>
+        <tbody>
+          {% for item in pending_redemptions %}
+          <tr>
+            <td>{{ item.student.username }}</td><td>{{ item.award.name }}</td><td>{{ item.redeemed_date }}</td><td>{{ item.notes or 'No notes' }}</td>
+            <td><div class="d-flex gap-2">
+              <form method="post" action="{{ url_for('decide_redemption_action', redemption_id=item.id, decision='approved') }}">
+                <button class="btn btn-success btn-sm" type="submit">Approve</button>
+              </form>
+              <form method="post" action="{{ url_for('decide_redemption_action', redemption_id=item.id, decision='rejected') }}">
+                <button class="btn btn-outline-secondary btn-sm" type="submit">Reject</button>
+              </form>
+            </div></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="empty-state">No pending redemptions. The review queue is clear.</p>
+    {% endif %}
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

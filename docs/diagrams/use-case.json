@@ -1,0 +1,37 @@
+{
+  "system": "Student Awards",
+  "actors": [
+    {"name": "Student", "side": "left"},
+    {"name": "Admin", "side": "right"}
+  ],
+  "use_cases": [
+    {
+      "name": "Log Volunteer Hours",
+      "actors": ["Student"],
+      "includes": ["Validate Volunteer Entry"]
+    },
+    {
+      "name": "Validate Volunteer Entry"
+    },
+    {
+      "name": "View Leaderboard",
+      "actors": ["Student", "Admin"],
+      "includes": ["View Volunteer Totals"]
+    },
+    {
+      "name": "View Volunteer Totals"
+    },
+    {
+      "name": "Redeem Awards",
+      "actors": ["Student"],
+      "includes": ["Check Award Eligibility"],
+      "extends": ["Request Award Review"]
+    },
+    {
+      "name": "Check Award Eligibility"
+    },
+    {
+      "name": "Request Award Review"
+    }
+  ]
+}

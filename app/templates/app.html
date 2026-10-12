@@ -1,9 +1,254 @@
 {% extends "authenticated-base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Student Dashboard{% endblock %}
 
 {% block subpage_content %}
-<div class="container-fluid py-2">
-  <h1 class="h4 mb-2">Home</h1>
-  <p class="text-muted mb-0">Workflow screens replace this shell in Phase 5 implement.</p>
+<div class="student-shell">
+  <div class="row align-items-center mb-4">
+    <div class="col-md-8">
+      <p class="section-kicker">Student Awards</p>
+      <h1 class="h3 mb-0">Volunteer dashboard</h1>
+    </div>
+    <div class="col-md-4 text-md-end">
+      <span class="chip chip-primary">Rank #{{ summary.rank }}</span>
+    </div>
+
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="metric-card">
+        <span>Total hours</span>
+        <strong>{{ '%.1f' % summary.total_hours }}</strong>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="metric-card">
+        <span>Pending review</span>
+        <strong>{{ summary.pending_redemptions }}</strong>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="metric-card">
+        <span>Approved rewards</span>
+        <strong>{{ summary.approved_redemptions }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-5" id="hours-log">
+      <section class="panel-block">
+        <div class="panel-header">
+          <h2>Log volunteer hours</h2>
+        </div>
+        <form method="post" action="{{ url_for('log_hours_action') }}">
+          <div class="mb-3">
+            <label class="form-label" for="activity_description">Activity</label>
+            <input class="form-control" id="activity_description" name="activity_description" type="text" placeholder="Campus tutoring session" required>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="log_date">Date</label>
+              <input class="form-control" id="log_date" name="log_date" type="date" value="{{ today }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="hours">Hours</label>
+              <input class="form-control" id="hours" name="hours" type="number" min="0.5" step="0.5" value="1.0" required>
+            </div>
+          </div>
+          <button class="btn btn-primary mt-3 w-100" type="submit">Save hours</button>
+        </form>
+      </section>
+    </div>
+
+    <div class="col-lg-7">
+      <section class="panel-block">
+        <div class="panel-header">
+          <h2>Recent volunteer activity</h2>
+        </div>
+        {% if logs %}
+        <div class="table-wrap">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Activity</th>
+                <th>Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in logs %}
+              <tr>
+                <td>{{ log.log_date }}</td>
+                <td>{{ log.activity_description }}</td>
+                <td>{{ log.hours }}h</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="empty-state">No volunteer hours logged yet. Add your first activity above.</p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-1" id="leaderboard">
+    <div class="col-lg-7">
+      <section class="panel-block">
+        <div class="panel-header">
+          <h2>Leaderboard</h2>
+        </div>
+        <div class="table-wrap">
+          <table class="table leaderboard-table align-middle">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Student</th>
+                <th>Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in leaderboard %}
+              <tr class="{{ 'highlight-row' if entry.id == user.id }}">
+                <td>#{{ entry.rank }}</td>
+                <td>{{ entry.username }}</td>
+                <td>{{ '%.1f' % entry.total_hours }}h</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-lg-5">
+      <section class="panel-block" id="award-catalog">
+        <div class="panel-header">
+          <h2>Award catalog</h2>
+        </div>
+        <div class="award-list">
+          {% for award in awards %}
+          <div class="award-card">
+            <div class="award-art">
+              <img src="{{ url_for('static', path=award.image_path) }}" alt="" aria-hidden="true">
+            </div>
+            <div class="award-topline">
+              <h3>{{ award.name }}</h3>
+              <span class="status-pill status-{{ award.status }}">{{ award.status|title }}</span>
+            </div>
+            <p class="award-meta">Requires {{ '%.1f' % award.milestone_hours }} volunteer hours</p>
+            <p>{{ award.description }}</p>
+            {% if award.can_redeem %}
+            <form method="post" action="{{ url_for('redeem_award_action', award_id=award.id) }}">
+              <textarea class="form-control form-control-sm mb-2" name="notes" rows="2" placeholder="Optional notes for the review"></textarea>
+              <button class="btn btn-primary w-100" type="submit">
+                {{ 'Request again' if award.status == 'rejected' else 'Request redemption' }}
+              </button>
+            </form>
+            {% elif award.status == 'pending' %}
+            <div class="award-state-message">Your request is awaiting admin review.</div>
+            {% elif award.status == 'approved' %}
+            <div class="award-state-message">This award has been approved.</div>
+            {% else %}
+            {% set remaining_hours = award.milestone_hours - summary.total_hours %}
+            <div class="award-state-message mb-2">Log {{ '%.1f' % remaining_hours }} more hours to unlock this award.</div>
+            <button class="btn btn-outline-secondary w-100" type="button" disabled>
+              Request redemption at {{ '%.1f' % award.milestone_hours }} hours
+            </button>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-1" id="award-history">
+    <div class="col-12">
+      <section class="panel-block">
+        <div class="panel-header">
+          <h2>My award activity</h2>
+        </div>
+        {% if redemptions %}
+        <div class="table-wrap">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Award</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for redemption in redemptions %}
+              <tr>
+                <td>{{ redemption.award.name }}</td>
+                <td><span class="status-pill status-{{ redemption.approval_status }}">{{ redemption.approval_status|title }}</span></td>
+                <td>{{ redemption.redeemed_date }}</td>
+                <td>
+                  {% set appeal = appeals.get(redemption.id) %}
+                  {% if appeal %}
+                    <div>{{ redemption.notes or 'No notes' }}</div>
+                    <span class="status-pill status-{{ appeal.status }}">Appeal {{ appeal.status|title }}</span>
+                    {% if appeal.admin_notes %}<div class="small text-muted mt-1">{{ appeal.admin_notes }}</div>{% endif %}
+                    <div class="small text-muted mt-1">An appeal has been submitted. This request can only be appealed once.</div>
+                  {% elif redemption.approval_status == 'rejected' %}
+                    <form method="post" action="{{ url_for('submit_appeal_action', redemption_id=redemption.id) }}">
+                      <label class="visually-hidden" for="appeal-reason-{{ redemption.id }}">Reason for appeal</label>
+                      <textarea class="form-control form-control-sm mb-2" id="appeal-reason-{{ redemption.id }}" name="reason" rows="2" placeholder="Explain why you are appealing" required></textarea>
+                      <button class="btn btn-outline-primary btn-sm" type="submit">Submit one-time appeal</button>
+                    </form>
+                  {% else %}
+                    {{ redemption.notes or 'No notes' }}
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="empty-state">Your award history is empty. Once you meet a milestone, your redemption request will appear here.</p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-1" id="personal-awards">
+    <div class="col-12">
+      <section class="panel-block">
+        <div class="panel-header">
+          <h2>Personal Awards</h2>
+        </div>
+        {% if personal_awards %}
+        <div class="award-list">
+          {% for redemption in personal_awards %}
+          <article class="award-card personal-award-card">
+            {% set award_image = {
+              'Movie Ticket': 'img/rewards/movie-ticket.svg',
+              'Gift Card': 'img/rewards/gift-card.svg',
+              'School Hoodie': 'img/rewards/school-hoodie.svg'
+            }.get(redemption.award.name, 'img/rewards/award.svg') %}
+            <div class="award-art">
+              <img src="{{ url_for('static', path=award_image) }}" alt="" aria-hidden="true">
+            </div>
+            <div class="award-topline">
+              <h3><span class="material-symbols-outlined align-middle me-1" aria-hidden="true">military_tech</span>{{ redemption.award.name }}</h3>
+              <span class="status-pill status-approved">Awarded</span>
+            </div>
+            <p class="award-meta mb-0">Granted {{ redemption.redeemed_date }} · {{ '%.1f' % redemption.award.milestone_hours }} volunteer hours</p>
+            <p class="mb-0 mt-2">{{ redemption.award.description }}</p>
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">Approved awards will appear here.</p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
 </div>
 {% endblock %}

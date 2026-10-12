@@ -1,9 +1,132 @@
 {% extends "authenticated-base.html" %}
-{% block title %}Admin{% endblock %}
+{% block title %}Admin Review{% endblock %}
 
 {% block subpage_content %}
-<div class="container-fluid py-2">
-  <h1 class="h4 mb-2">Admin</h1>
-  <p class="text-muted mb-0">Admin workflow screens replace this shell in Phase 5 implement.</p>
+<div class="student-shell">
+  <div class="row align-items-center mb-4">
+    <div class="col-md-8">
+      <p class="section-kicker">Admin</p>
+      <h1 class="h3 mb-0">Award approval queue</h1>
+    </div>
+    <div class="col-md-4 text-md-end">
+      <span class="chip chip-primary">{{ pending_redemptions|length }} pending</span>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="metric-card">
+        <span>Pending</span>
+        <strong>{{ pending_redemptions|length }}</strong>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="metric-card">
+        <span>Students</span>
+        <strong>{{ leaderboard|length }}</strong>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="metric-card">
+        <span>Active awards</span>
+        <strong>{{ award_count }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7" id="leaderboard">
+      <section class="panel-block">
+        <div class="panel-header">
+          <h2>Leaderboard</h2>
+        </div>
+        <div class="table-wrap">
+          <table class="table leaderboard-table align-middle">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Student</th>
+                <th>Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in leaderboard %}
+              <tr>
+                <td>#{{ entry.rank }}</td>
+                <td>{{ entry.username }}</td>
+                <td>{{ '%.1f' % entry.total_hours }}h</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-lg-5">
+      <section class="panel-block">
+        <div class="panel-header">
+          <h2>Admin overview</h2>
+        </div>
+        <div class="list-group list-group-flush">
+          <div class="list-group-item border-0 px-0 py-2 d-flex justify-content-between">
+            <span>Review requests</span>
+            <strong>{{ pending_redemptions|length }}</strong>
+          </div>
+          <div class="list-group-item border-0 px-0 py-2 d-flex justify-content-between">
+            <span>Leaderboard entries</span>
+            <strong>{{ leaderboard|length }}</strong>
+          </div>
+          <div class="list-group-item border-0 px-0 py-2 d-flex justify-content-between">
+            <span>Top student</span>
+            <strong>{{ leaderboard[0].username if leaderboard else 'None' }}</strong>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel-block mt-4" id="pending-redemptions">
+    <div class="panel-header">
+      <h2>Pending redemptions</h2>
+    </div>
+    {% if pending_redemptions %}
+    <div class="table-wrap">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Award</th>
+            <th>Date</th>
+            <th>Notes</th>
+            <th>Decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in pending_redemptions %}
+          <tr>
+            <td>{{ item.student.username }}</td>
+            <td>{{ item.award.name }}</td>
+            <td>{{ item.redeemed_date }}</td>
+            <td>{{ item.notes or 'No notes' }}</td>
+            <td>
+              <div class="d-flex gap-2">
+                <form method="post" action="{{ url_for('decide_redemption_action', redemption_id=item.id, decision='approved') }}">
+                  <button class="btn btn-success btn-sm" type="submit">Approve</button>
+                </form>
+                <form method="post" action="{{ url_for('decide_redemption_action', redemption_id=item.id, decision='rejected') }}">
+                  <button class="btn btn-outline-secondary btn-sm" type="submit">Reject</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="empty-state">No pending redemptions. The review queue is clear.</p>
+    {% endif %}
+  </section>
 </div>
 {% endblock %}

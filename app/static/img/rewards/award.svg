@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 190" fill="none">
+  <defs>
+    <linearGradient id="medal" x1="135" y1="34" x2="224" y2="151" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4CE79"/>
+      <stop offset="1" stop-color="#D89B35"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="190" rx="18" fill="#F3EBDD"/>
+  <circle cx="180" cy="92" r="62" fill="#D9A23F" opacity=".14"/>
+  <path d="m145 34 35 20 35-20-10 61h-50l-10-61Z" fill="#0D5EA8"/>
+  <circle cx="180" cy="104" r="43" fill="url(#medal)" stroke="#9B661B" stroke-width="4"/>
+  <circle cx="180" cy="104" r="31" stroke="#FFF5D9" stroke-width="3"/>
+  <path d="m180 80 7 15 17 2-12 11 3 17-15-8-15 8 3-17-12-11 17-2 7-15Z" fill="#FFF8E8"/>
+</svg>

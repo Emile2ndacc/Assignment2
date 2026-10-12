@@ -1,0 +1,59 @@
+{% extends "authenticated-base.html" %}
+{% block title %}Student Appeals{% endblock %}
+
+{% block subpage_content %}
+<div class="student-shell">
+  <div class="row align-items-center mb-4">
+    <div class="col-md-8">
+      <p class="section-kicker">Admin review</p>
+      <h1 class="h3 mb-0">Student Appeals</h1>
+    </div>
+    <div class="col-md-4 text-md-end">
+      <span class="chip chip-primary">{{ pending_appeals|length }} pending</span>
+    </div>
+  </div>
+
+  <section class="panel-block">
+    <div class="panel-header">
+      <h2>Appeals awaiting review</h2>
+    </div>
+    {% if pending_appeals %}
+    <div class="table-wrap">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Award</th>
+            <th>Appeal date</th>
+            <th>Reason</th>
+            <th>Review</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in pending_appeals %}
+          <tr>
+            <td>{{ item.student.username }}</td>
+            <td>{{ item.award.name }}</td>
+            <td>{{ item.appeal.appeal_date }}</td>
+            <td>{{ item.appeal.reason }}</td>
+            <td>
+              <form method="post" action="{{ url_for('decide_appeal_action', appeal_id=item.appeal.id, decision='approved') }}">
+                <label class="visually-hidden" for="appeal-note-{{ item.appeal.id }}">Admin note for the student</label>
+                <textarea class="form-control form-control-sm mb-2" id="appeal-note-{{ item.appeal.id }}" name="admin_notes" rows="2" placeholder="Optional note to the student"></textarea>
+                <div class="d-flex flex-wrap gap-2">
+                  <button class="btn btn-primary btn-sm" type="submit">Approve appeal &amp; grant award</button>
+                  <button class="btn btn-outline-secondary btn-sm" type="submit" formaction="{{ url_for('decide_appeal_action', appeal_id=item.appeal.id, decision='rejected') }}">Deny appeal</button>
+                </div>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="empty-state">There are no student appeals awaiting review.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
