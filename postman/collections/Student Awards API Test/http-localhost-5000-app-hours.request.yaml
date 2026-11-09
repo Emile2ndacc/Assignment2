@@ -1,0 +1,24 @@
+$kind: http-request
+name: http://localhost:5000/app/hours
+description: ""
+url: http://localhost:5000/app/hours
+method: GET
+body:
+  type: formdata
+  content:
+    - type: text
+      key: activity description
+      value: Peer Helping
+      description: ""
+      disabled: false
+    - type: text
+      key: hours
+      value: "5"
+      description: ""
+      disabled: false
+    - type: text
+      key: log date
+      value: 2026.11.09
+      description: ""
+      disabled: false
+order: 12000

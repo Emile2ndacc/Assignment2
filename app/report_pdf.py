@@ -11,6 +11,7 @@ import subprocess
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import unquote
 
 from fpdf import FPDF, FontFace, TextStyle
 from fpdf.html import HTML2FPDF
@@ -48,6 +49,26 @@ _WIREFRAMES_SECTION_RE = re.compile(
 )
 _WIREFRAME_IMAGE_RE = re.compile(
     r"!\[[^\]]*\]\((?:docs/)?wireframes/([^)]+)\)",
+    re.IGNORECASE,
+)
+WORKFLOWS_HEADING = "## Workflows"
+_WORKFLOWS_DIR = REPO_ROOT / "docs" / "workflows"
+_WORKFLOWS_SECTION_RE = re.compile(
+    r"^## Workflows\n.*?(?=^## |\Z)",
+    re.MULTILINE | re.DOTALL,
+)
+_WORKFLOW_IMAGE_RE = re.compile(
+    r"!\[[^\]]*\]\((?:docs/)?workflows/([^)]+)\)",
+    re.IGNORECASE,
+)
+USER_ACCEPTANCE_TESTS_HEADING = "## User Acceptance Tests"
+_USER_ACCEPTANCE_TESTS_DIR = REPO_ROOT / "docs" / "user-acceptance-tests"
+_USER_ACCEPTANCE_TESTS_SECTION_RE = re.compile(
+    r"^## User Acceptance Tests\n.*?(?=^## |\Z)",
+    re.MULTILINE | re.DOTALL,
+)
+_USER_ACCEPTANCE_TEST_IMAGE_RE = re.compile(
+    r"!\[[^\]]*\]\((?:docs/)?user-acceptance-tests/([^)]+)\)",
     re.IGNORECASE,
 )
 
@@ -123,7 +144,7 @@ class ReportPDF(FPDF):
             self.set_text_color(255, 255, 255)
             self.set_font("Body", "B", 20)
             self.set_xy(self.l_margin, 9)
-            self.cell(self.epw, 10, "COMP 3613 Assignment 1")
+            self.cell(self.epw, 10, "COMP 3613 Assignment 2")
             self.set_font("Body", "", 11)
             self.set_xy(self.l_margin, 20)
             subtitle = "Individual report (incomplete)" if self.incomplete else "Individual report"
@@ -135,7 +156,7 @@ class ReportPDF(FPDF):
         self.set_y(10)
         self.set_font("Body", "", 9)
         self.set_text_color(*NAVY)
-        self.cell(self.epw, 6, "COMP 3613 Assignment 1", new_x="LMARGIN", new_y="NEXT")
+        self.cell(self.epw, 6, "COMP 3613 Assignment 2", new_x="LMARGIN", new_y="NEXT")
         self.ln(1.5)
         self.set_draw_color(*GOLD)
         self.set_line_width(0.5)
@@ -184,7 +205,7 @@ def export_report(
     if not src.is_file():
         src.parent.mkdir(parents=True, exist_ok=True)
         src.write_text(
-            "# COMP 3613 Assignment 1\n\nDraft. Export is allowed at any stage.\n",
+            "# COMP 3613 Assignment 2\n\nDraft. Export is allowed at any stage.\n",
             encoding="utf-8",
         )
         print(f"Created {src} (empty draft).")
@@ -219,6 +240,8 @@ def export_report(
     markdown = merge_judge_section(src.read_text(encoding="utf-8"))
     markdown = ensure_usecase_in_report(markdown, report_path=src)
     markdown = ensure_wireframes_in_report(markdown, report_path=src)
+    markdown = ensure_workflows_in_report(markdown)
+    markdown = ensure_user_acceptance_tests_in_report(markdown)
     markdown = merge_transcripts_section(markdown, transcripts)
     markdown = stamp_markdown(markdown, integrity)
     src.write_text(markdown, encoding="utf-8")
@@ -422,6 +445,122 @@ def ensure_wireframes_in_report(
     if not text.endswith("\n"):
         text += "\n"
     return text
+
+
+def ensure_workflows_in_report(markdown: str) -> str:
+    """Embed images from docs/workflows/ in the report's Workflows section."""
+    text = markdown.replace("\r\n", "\n").replace("\r", "\n")
+    text = re.sub(
+        r"!\[([^\]]*)\]\(docs/workflows/([^)]+)\)",
+        r"![\1](workflows/\2)",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if not _WORKFLOWS_DIR.is_dir():
+        return text
+
+    files = [
+        path
+        for path in sorted(_WORKFLOWS_DIR.iterdir())
+        if path.is_file() and path.suffix.lower() in _WIREFRAME_EXTS
+    ]
+    if not files:
+        return text
+
+    linked = {
+        match.group(1).replace("\\", "/").lstrip("./")
+        for match in _WORKFLOW_IMAGE_RE.finditer(text)
+    }
+    blocks = []
+    for path in files:
+        rel = f"workflows/{path.name}"
+        if path.name in linked or rel in linked:
+            continue
+        alt = path.stem.replace("-", " ").replace("_", " ")
+        blocks.append(f"### {alt}\n\n![{alt}]({rel})\n")
+
+    if not blocks:
+        return text
+
+    extra = "\n".join(blocks).rstrip() + "\n"
+    if _WORKFLOWS_SECTION_RE.search(text):
+        def _append_missing(match: re.Match[str]) -> str:
+            body = match.group(0).rstrip()
+            lines = [line for line in body.splitlines() if line.strip()]
+            if len(lines) <= 1:
+                return f"{WORKFLOWS_HEADING}\n\n{extra}\n"
+            return body + "\n\n" + extra + "\n"
+
+        text = _WORKFLOWS_SECTION_RE.sub(_append_missing, text, count=1)
+    elif re.search(r"^## Theming\s*$", text, re.MULTILINE):
+        text = re.sub(
+            r"^## Theming\s*$",
+            f"{WORKFLOWS_HEADING}\n\n{extra}\n## Theming",
+            text,
+            count=1,
+            flags=re.MULTILINE,
+        )
+    else:
+        text = text.rstrip() + f"\n\n{WORKFLOWS_HEADING}\n\n{extra}\n"
+    return text if text.endswith("\n") else text + "\n"
+
+
+def ensure_user_acceptance_tests_in_report(markdown: str) -> str:
+    """Embed images from docs/user-acceptance-tests/ in the report."""
+    text = markdown.replace("\r\n", "\n").replace("\r", "\n")
+    text = re.sub(
+        r"!\[([^\]]*)\]\(docs/user-acceptance-tests/([^)]+)\)",
+        r"![\1](user-acceptance-tests/\2)",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if not _USER_ACCEPTANCE_TESTS_DIR.is_dir():
+        return text
+
+    files = [
+        path
+        for path in sorted(_USER_ACCEPTANCE_TESTS_DIR.iterdir())
+        if path.is_file() and path.suffix.lower() in _WIREFRAME_EXTS
+    ]
+    if not files:
+        return text
+
+    linked = {
+        unquote(match.group(1)).replace("\\", "/").lstrip("./")
+        for match in _USER_ACCEPTANCE_TEST_IMAGE_RE.finditer(text)
+    }
+    blocks = []
+    for path in files:
+        rel = f"user-acceptance-tests/{path.name}"
+        if path.name in linked or rel in linked:
+            continue
+        alt = path.stem.replace("-", " ").replace("_", " ")
+        blocks.append(f"### {alt}\n\n![{alt}]({rel})\n")
+
+    if not blocks:
+        return text
+
+    extra = "\n".join(blocks).rstrip() + "\n"
+    if _USER_ACCEPTANCE_TESTS_SECTION_RE.search(text):
+        def _append_missing(match: re.Match[str]) -> str:
+            body = match.group(0).rstrip()
+            lines = [line for line in body.splitlines() if line.strip()]
+            if len(lines) <= 1:
+                return f"{USER_ACCEPTANCE_TESTS_HEADING}\n\n{extra}\n"
+            return body + "\n\n" + extra + "\n"
+
+        text = _USER_ACCEPTANCE_TESTS_SECTION_RE.sub(_append_missing, text, count=1)
+    elif re.search(r"^## Theming\s*$", text, re.MULTILINE):
+        text = re.sub(
+            r"^## Theming\s*$",
+            f"{USER_ACCEPTANCE_TESTS_HEADING}\n\n{extra}\n## Theming",
+            text,
+            count=1,
+            flags=re.MULTILINE,
+        )
+    else:
+        text = text.rstrip() + f"\n\n{USER_ACCEPTANCE_TESTS_HEADING}\n\n{extra}\n"
+    return text if text.endswith("\n") else text + "\n"
 
 
 def merge_judge_section(markdown: str, judge_path: Path | None = None) -> str:
@@ -998,7 +1137,7 @@ def _blocks(markdown: str) -> list[tuple]:
 def _resolve(raw: str, base: Path) -> Path | None:
     """Resolve an image path from report-relative, repo-root, or docs/-prefixed forms."""
     candidates: list[Path] = []
-    path = Path(raw)
+    path = Path(unquote(raw))
     if path.is_absolute():
         candidates.append(path)
     else:

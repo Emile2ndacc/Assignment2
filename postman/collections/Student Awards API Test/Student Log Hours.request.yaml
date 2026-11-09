@@ -1,0 +1,26 @@
+$kind: http-request
+url: http://localhost:5000/app/log-hours
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: activity description
+      value: Campus Cleanup
+      description: ""
+      disabled: false
+    - type: text
+      key: hours
+      value: "15"
+      description: ""
+      disabled: false
+    - type: text
+      key: log_date
+      value: 11/09/2026
+      description: ""
+      disabled: false
+scripts:
+  - type: afterResponse
+    code: pm.test("Status is 303", () => pm.response.to.have.status(303));
+    language: text/javascript
+order: 1000

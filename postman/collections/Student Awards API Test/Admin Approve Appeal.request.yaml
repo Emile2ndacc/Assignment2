@@ -1,0 +1,8 @@
+$kind: http-request
+url: http://localhost:5000/admin/appeals/1/approve
+method: POST
+scripts:
+  - type: afterResponse
+    code: pm.test("Status is 303", () => pm.response.to.have.status(303));
+    language: text/javascript
+order: 10000

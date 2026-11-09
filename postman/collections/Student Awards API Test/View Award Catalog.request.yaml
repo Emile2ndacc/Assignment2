@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:5000/app/awards
+method: GET
+order: 3000

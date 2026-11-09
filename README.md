@@ -159,14 +159,14 @@ The app binds `0.0.0.0` and reads `PORT` when Render sets it. Locally it uses `A
 | Agent | MCP config in this repo | Auth |
 |-------|-------------------------|------|
 | **Cursor** | [`.cursor/mcp.json`](.cursor/mcp.json) | Prefer `/add-plugin render` then **Authenticate** (OAuth). Or create an [API key](https://dashboard.render.com/u/settings?add-api-key) and put it only in your user `~/.cursor/mcp.json` headers — never in the repo. |
-| **GitHub Copilot** (VS Code) | [`.vscode/mcp.json`](.vscode/mcp.json) | Create a Render [API key](https://dashboard.render.com/u/settings?add-api-key). Open `.vscode/mcp.json`, click **Start**, paste the key when prompted (`${input:render-api-key}`). Use Copilot Chat in **Agent** mode. See [Extend Copilot Chat with MCP](https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp-in-your-ide/extend-copilot-chat-with-mcp). |
+| **GitHub Copilot** (VS Code) | [`.vscode/mcp.json`](.vscode/mcp.json) | Create a Render [API key](https://dashboard.render.com/u/settings?add-api-key). If `render` is disabled, run **MCP: List Servers** from the Command Palette and enable it. When `render` is already running, no key prompt or separate Start action is needed: VS Code securely retains an entered input value. In Copilot Chat **Agent** mode, explicitly ask it to deploy with the Render MCP; for example: “Use the Render MCP to deploy this project according to `render.yaml`. Ask me for any missing deployment choices before creating resources.” See [Extend Copilot Chat with MCP](https://docs.github.com/en/copilot/how-tos/provide-context/use-mcp-in-your-ide/extend-copilot-chat-with-mcp). |
 | **OpenCode** | [`opencode.json`](opencode.json) | From the project root run `opencode`, then `/mcps` (or `opencode mcp auth render`) and finish OAuth in the browser. |
 
 Service shape lives in [`render.yaml`](render.yaml) (Blueprint reference for the agent — create resources with MCP, do not also apply the Blueprint in the Dashboard).
 
 1. Push your repo to GitHub (Render clones the remote; it cannot deploy an unpushed folder).
 2. Create a free [Render](https://render.com) account. Connect MCP for your agent using the table above, then set the active workspace (e.g. “Set my Render workspace to …”).
-3. Ask the agent to deploy using the Render MCP, matching `render.yaml`:
+3. In Copilot Chat **Agent** mode (or the equivalent agent mode for your tool), explicitly ask the agent to deploy using the Render MCP, matching `render.yaml`. A running MCP connection does not start a deployment by itself:
    - `create_postgres` — name `faststarter-db`, plan `free`, region `oregon`, disk 1 GB
    - `create_web_service` — runtime `python`, plan `free`, **same region**, repo and branch, build `pip install -r requirements.txt`
 4. Set env vars on the web service (use the database **internal** connection string, not the external one):

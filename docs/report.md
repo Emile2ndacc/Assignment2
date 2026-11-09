@@ -5,7 +5,7 @@ expected_root: e84cd692d0b85eefe546385661958c27d07e8be6c5176a82012f68ccff5c8beb
 mismatches: none
 -->
 
-# COMP 3613 Assignment 1
+# COMP 3613 Assignment 2
 
 Draft this file with the Guide. **Update it after every phase milestone** before you pause. The use-case diagram is a UML PNG at `docs/diagrams/use-case.png`, linked from this file as `diagrams/use-case.png` (path relative to `docs/report.md`). The model diagram is Mermaid. **Embed wireframe images** as `wireframes/<file>` (files live in `docs/wireframes/`).
 
@@ -141,6 +141,50 @@ covered: yes
 
 ![Wireframe diagram](wireframes/Wireframe diagram.png)
 
+## Workflows
+
+### External workflow diagram
+
+![Student Awards external workflows](workflows/workflow.png)
+
+## User Acceptance Tests
+
+The test diagrams below are ordered by their section and test-case numbers. UAT cases are listed first, followed by the unit and integration test plans.
+
+### Section 1 — User Acceptance Tests
+
+#### UAT-01 and UAT-02 — Log Volunteer Hours and View Leaderboard
+
+![UAT-01 Log Volunteer Hours and UAT-02 View Leaderboard](user-acceptance-tests/uat%281%20and%202%29.png)
+
+#### UAT-03 — Redeem Award
+
+![UAT-03 Redeem Award](user-acceptance-tests/uat%203.png)
+
+#### UAT-04 and UAT-05 — Approve and Reject Redemption
+
+![UAT-04 Approve Redemption and UAT-05 Reject Redemption](user-acceptance-tests/uat%204%20and%205.png)
+
+### Section 2 — Unit Test Plan
+
+![Section 2 Unit Test Plan](user-acceptance-tests/Section%202%20ut%20plan.png)
+
+### Section 3 — Integration Test Plan
+
+#### IT-01 — Student Logs Hours and Leaderboard Updates
+
+![Section 3 Integration Test Plan: IT-01](user-acceptance-tests/Section%203.png)
+
+#### IT-02 and IT-03 — Admin Approves or Rejects Award
+
+![Section 3 Integration Test Plan: IT-02 and IT-03](user-acceptance-tests/Section%203%20%282%20and%203%29.png)
+
+## Automated Test Results
+
+The project test suite was run with `pytest -q` on 2026-11-09: **15 passed, 0 failed** (1.35 seconds). The passing suite includes unit coverage for redemption eligibility, duplicate requests, retry after rejection, and approval decisions, along with integration coverage for logging hours and student/admin redemption approval and rejection.
+
+Pytest also emitted one non-blocking Starlette deprecation warning about its current `httpx` integration with `TestClient`; it did not cause a test failure.
+
 ## Theming
 
 The Student Awards brand uses a bolder, more confident palette than the washed-out starter design: deep blue for trust and academic credibility, warm gold accents for achievement and reward, and a softened ivory background that keeps the interface readable without losing the premium student-facing feel. The display font is a strong serif wordmark for the brand and the body font stays modern and clear for forms and dashboards. The same palette and typography are applied across the landing page, login, registration, and authenticated dashboard so the app feels like one consistent product rather than a generic starter theme.
@@ -166,13 +210,13 @@ Every account a marker needs, including extra users you added. Starter accounts:
 
 ## YouTube URL
 
-https://youtu.be/qvein4hsmFA
+https://www.youtube.com/watch?v=b3gu53tiZSE
 
 ## Session transcripts
 
 Filled when the Guide builds the report: the agent writes chat markdown into `docs/transcripts/`; `python manage.py report` packages them.
 
-Guide packaged **5** chat(s) in `docs/transcripts/` (and `docs/transcripts.zip`).
+Guide packaged **8** chat(s) in `docs/transcripts/` (and `docs/transcripts.zip`).
 
 Index: [docs/transcripts/INDEX.md](transcripts/INDEX.md)
 
@@ -181,17 +225,20 @@ Index: [docs/transcripts/INDEX.md](transcripts/INDEX.md)
 - [`phase-4-wireframes`](transcripts/phase-4-wireframes.md)
 - [`phase-5-theming-build`](transcripts/phase-5-theming-build.md)
 - [`phase-6-deploy`](transcripts/phase-6-deploy.md)
+- [`test-suite-report-update`](transcripts/test-suite-report-update.md)
+- [`user-acceptance-tests-report-update`](transcripts/user-acceptance-tests-report-update.md)
+- [`workflow-report-update`](transcripts/workflow-report-update.md)
 
 ## Competency (student-judge)
 
 Filled by Guide from the student-judge run when this report was built.
 
-**Student / session:** Student Awards project / COMP 3613 assignment
-**Artifact:** Guide chats for this project and the packaged `docs/transcripts` dump
+**Student / session:** Student Awards project / COMP 3613 Assignment 2
+**Artifact:** Available Guide-written phase transcripts, current `docs/report.md`, diagrams, wireframes, and test suite
 **Phases in evidence:** 1–6 (COMP 3613; Phase 5 polish, Phase 6 deploy partial; never generic 0–5)
 
-**Judged at:** 2026-10-12T00:00:00Z
-**Evidence pass:** re-read native Guide chats + current `docs/report.md` + current `docs/transcripts/*.md` (prior judge.md ignored)
+**Judged at:** 2026-11-09T16:07:00-04:00
+**Evidence pass:** Re-read current `docs/report.md`, `docs/diagrams/`, `docs/wireframes/`, and all available Guide transcript markdown; checked the current test suite result. Older native Copilot CLI chats were not readable. Prior scorecard ignored.
 
 ### Totals
 | | Count / value |
@@ -200,67 +247,65 @@ Filled by Guide from the student-judge run when this report was built.
 | N/A (excluded) | 0 |
 | Metrics scored | 12 |
 | Scoreable max | 48 |
-| Awarded total | 43 / 48 |
-| **Overall (avg of scored)** | **3.6 / 4** |
-| Impression mark | 72 / 20 |
+| Awarded total | 38 / 48 |
+| **Overall (avg of scored)** | **3.2 / 4** |
+| Impression mark | 16 / 20 |
 
 ## Scorecard
 
 | ID | Metric | Score / 4 | In avg | Evidence |
 |----|--------|----------:|:------:|----------|
-| M1 | Phase discipline | 3 | yes | The workflow sequence and phase gating were followed: Phase 2, 3, 4, and 5 each had a dedicated flow, and the project stayed in local polish before the deploy gate. |
-| M2 | Problem framing | 4 | yes | The project and workflow names are clear in the report and the key include/extend decisions were discussed (`Redeem Awards extends Request Award Review`). |
-| M3 | Decision ownership | 4 | yes | The student chose the Student Awards domain, approved the use-case extension, and confirmed the core model choices rather than accepting a blank template. |
-| M4 | Artefact-before-code | 4 | yes | The ERD/wireframe/report artefacts were used as the spec and remained present throughout the build. |
-| M5 | Verification habit | 3 | yes | The Phase 5 and local verification notes show the app was checked against the intended flows, though the final Render deploy was not completed. |
-| M6 | Assignment fit | 3 | yes | The app aligns with the assignment: themed branding, workflow coverage, and a layered architecture narrative are present in the report; deployment remains the missing live step. |
-| M7 | Slice explanation | 3 | yes | The report explains the model and workflow logic in the student’s language, and the architecture narrative is consistent with service/repository layering. |
-| M8 | Prompt quality | 4 | yes | The prompts are phase-tagged and concrete (`Use the student-build skill. Phase 5...`, `start phase 6`), with explicit workflow and model milestones. |
-| M9 | Response to pushback | 3 | yes | The build responded to the use-case extension and design-level clarifications rather than accepting an incomplete first draft. |
-| M10 | Integrity | 4 | yes | No evidence of external-LLM laundering or skill tampering. |
-| M11 | Provenance continuity | 4 | yes | The decisions and artefacts are consistent throughout the project phases and the project threads. |
-| M12 | Sincerity trajectory | 4 | yes | No suspicion spiral or confidence drop was recorded; the process stayed coherent and self-owned. |
+| M1 | Phase discipline | 3 | yes | The report documents Phases 1–5 before Phase 6, which remains pending a public URL. |
+| M2 | Problem framing | 3 | yes | The report names Student Awards and three workflows; the Phase 2 transcript records the student asking “does nothing extend?” and choosing “add one extend.” |
+| M3 | Decision ownership | 3 | yes | The Phase 3 transcript records the student's entity/property list and relationship decisions; later report content follows the student's chosen theme and workflows. |
+| M4 | Artefact-before-code | 3 | yes | The ERD, use-case diagram, and student wireframe are present; implementation notes correspond to the same workflows. |
+| M5 | Verification habit | 3 | yes | The report records local verification and student/admin navigation checks; the latest full test run is documented as 15 passing cases. |
+| M6 | Assignment fit | 3 | yes | The report describes the Student Awards model and layered implementation, followed by polish and a pending deployment. |
+| M7 | Slice explanation | 3 | yes | Transcripts summarize relationship and architecture checks; model notes describe eligibility, redemption status, and appeal rules. |
+| M8 | Prompt quality | 3 | yes | Transcripts show phase-oriented prompts; the student also asked for redemption tests to match the current workflow and designed app. |
+| M9 | Response to pushback | 3 | yes | The student engaged the include/extend discussion and continued steering test coverage after learning the existing unit test did not represent the full workflow. |
+| M10 | Integrity | 4 | yes | The current report's course skill-integrity marker is `pass`; available transcripts show no paste-back or answer-seeking flags. |
+| M11 | Provenance continuity | 3 | yes | The workflows, model, UI, and current tests remain about the same Student Awards system and its documented redemption states. |
+| M12 | Sincerity trajectory | 4 | yes | No suspicion rounds or sincerity blocks appear in the accessible transcript set; no suspicion spiral was needed. |
 
 ## Strengths
-- Clear project scope and workflow naming around Student Awards with a strong Phase 1/2/3 narrative.
-- Thoughtful use-case and ERD decisions, including the optional award-review extension and the shared leaderboard pattern.
-- Good phase discipline and documentation discipline: report checkpoints, wireframe coverage, and theming are recorded in the repository.
-- The implementation was aligned with the assignment’s UX and functional goals and the report communicates the layered design effectively.
-- The process shows consistent phase progression and enough local verification to support a credible submission path.
+- The report and diagrams consistently describe the Student Awards project and its three named workflows.
+- The student supplied a wireframe, external workflow diagram, and six test-plan diagrams; the report orders the acceptance, unit, and integration test plans.
+- The project test suite currently passes: **15 passed, 0 failed**. Redemption unit and integration coverage follows the app's implemented request and admin decision flows.
+- The report records Phase 5 local verification and polish before the Phase 6 deployment step.
 
 ## Gaps (priority order)
-1. Phase 6 deployment is still incomplete in the current evidence: the report shows a pending Render URL and no live deployed service was created in this session. This is the primary remaining gap.
-2. The local app was polished and verified, but the final live deployment gate is not yet met; the project is therefore strong locally but incomplete as a deployable submission.
+1. Phase 6 remains partial: `docs/report.md` contains `https://pending-render-deploy` rather than a live public Render URL.
 
 ## Phase gate status
 | Phase | Status | Note |
 |-------|--------|------|
-| 1 | met | Project and multiple workflows are named and recorded in the report. |
-| 2 | met | Use-case diagram and include/extend decisions are recorded. |
-| 3 | met | Model diagram and relationship/business-rule notes are recorded. |
-| 4 | met | Wireframe image is embedded and coverage is noted. |
-| 5 | met | Theme, build, and local polish are present; Phase 5 is not treated as a first-dump acceptance. |
-| 6 | partial | Deploy step is not completed in this session; Render URL and live service are still pending. |
+| 1 | met | Project and three workflows are documented; a separate Phase 1 chat was not available in the accessible transcript set. |
+| 2 | met | Use-case diagram and include/extend choice are recorded. |
+| 3 | met | Student entities, properties, and relationship discussion are summarized in the transcript. |
+| 4 | met | Student wireframe is embedded and coverage is recorded. |
+| 5 | met | Theme, implementation, local verification, and polish are recorded in the report. |
+| 6 | partial | The public Render URL is still pending. |
 
 ## Recommended next practice
-- Complete the Render deployment by authenticating the Render MCP and creating the Postgres database plus the web service from `render.yaml`, then replace the pending URL in the report with the live public URL and final marker logins.
+- Complete the Render Postgres and web-service deployment, then replace the pending URL in the report with the live app URL.
 
 ## Integrity note
-- Clean
-- No edited skills, no suspicious paste-back pattern, and no evidence of external-LLM laundering in the available project sessions.
+- Clean based on the accessible evidence.
+- Older native Copilot CLI chats could not be read; available Guide-written transcripts and project artifacts were used.
 
 ## Provenance flags
-- None
+- None observed.
 
 ## Sincerity log summary
-- Blocks found: 0
+- Blocks found: 0 in accessible transcripts
 - max round: 0
 - min/mean/final confidence: n/a
 - trend: n/a
-- cleared: n/a
+- cleared: no suspicion spiral needed
 
 ## Skips
-- Skips: 0/3 used (from Guide evidence). Skips are not an integrity failure.
+- Skips: 0/3 used (from available Guide evidence). Skips are not an integrity failure.
 
 ## Skill integrity
 
